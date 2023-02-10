@@ -497,7 +497,7 @@ if st.session_state.count==0:
       pand=st.radio('Wat is het type vastgoed?', ['huis', 'appartement', 'garage', 'bedrijfsvastgoed', 'grond'], key='pand')
       hoofdgemeente=st.selectbox('In welke gemeente is het pand gelegen?', list(set(postcodes.values())), key='hoofdgemeente')
       koop_huur=st.radio('Te koop of te huur?', ['te-koop', 'te-huur'], key='koop_huur')
-      st.form_submit_button(label="Geef me de lijst", on_click=increment_counter
+      st.form_submit_button(label="Geef me de lijst", on_click=increment_counter)
 if st.session_state.count==1:
   st.session_state.pand=st.session_state.pand
   st.session_state.hoofdgemeente=st.session_state.hoofdgemeente
