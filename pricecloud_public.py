@@ -553,8 +553,8 @@ if st.session_state.count==1:
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     # Convert the dataframe to an XlsxWriter Excel object.
     g_fin.to_excel(writer, sheet_name='Sheet1')
-      writer.close()
-      st.download_button(label="Download Excel workbook",
-                         data=output.getvalue(),
-                         file_name="pandas_simple.xlsx",
-                         mime="application/vnd.ms-excel")
+    writer.close()
+    st.download_button(label="Download Excel workbook",
+                       data=output.getvalue(),
+                       file_name="pandas_simple.xlsx",
+                       mime="application/vnd.ms-excel")
