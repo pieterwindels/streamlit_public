@@ -56,7 +56,7 @@ def url_constructor (koop_huur, pand, hoofdgemeente):
   
   return url_zi, url_iw
 
-#FUNCTION TO SCRAPE THE SELECTED ZIMMO PAGES
+#FUNCTION TO SCRAPE THE SELECTED ZM PAGES
 @st.cache(ttl=86400, show_spinner=False)
 def scrape_zi(url_zi):
   """This function scrapes all the zimmo pages that have real estate 
@@ -133,30 +133,30 @@ def scrape_zi(url_zi):
           if (ct==8 or ct==15 or ct==23 or ct==32):
             time.sleep(10) 
         except Exception as e:
-          df_ZIMMO=pd.DataFrame({})
-          return df_ZIMMO
+          df_ZM=pd.DataFrame({})
+          return df_ZM
   except Exception as e:
-    df_ZIMMO=pd.DataFrame({})
-    return df_ZIMMO
+    df_ZM=pd.DataFrame({})
+    return df_ZM
 
   #combine the different data sets into one single list of dicts. Each dict represents all values for a property.
-  vastgoed_data_ZIMMO=[]
+  vastgoed_data_ZM=[]
   for item in vastgoed_json:
     for dictionary in item:
-      vastgoed_data_ZIMMO.append(dictionary)
+      vastgoed_data_ZM.append(dictionary)
   e={}
   x=0
   for i in vastgoed["property_code"]:
       e[i]=vastgoed["property_time"][x]
       x=x+1
-  for item in vastgoed_data_ZIMMO:
+  for item in vastgoed_data_ZM:
     for key in e:
       if item["code"]==key:
         item['tijd_sinds_publ']=e[key]
       else:
         continue 
-  df_ZIMMO=pd.json_normalize(vastgoed_data_ZIMMO, sep='-')
-  return df_ZIMMO
+  df_ZM=pd.json_normalize(vastgoed_data_ZM, sep='-')
+  return df_ZM
 
 #FUNCTION TO SCRAPE THE SELECTED IW PAGES
 @st.cache(ttl=86400, show_spinner=False)
@@ -255,11 +255,11 @@ def df_IW_concat (df_IW, df_IW_contact):
   return df_IW
 
 #FUNCTION TO DELETE COLUMNS NOT NEEDED IN SCRAPED DFS
-def delete_columns_rows(df_ZIMMO, df_IW):
+def delete_columns_rows(df_ZM, df_IW):
   
   """This function takes as input the scraped df's and
   
-  deletes the colums (inplace=True) that are not needed. Returns df_ZIMMO and df_IW.
+  deletes the colums (inplace=True) that are not needed. Returns df_ZM and df_IW.
   """
 
   #define the columns list for each of the df's that need to be deleted:
@@ -314,11 +314,11 @@ def delete_columns_rows(df_ZIMMO, df_IW):
        'transaction-sale-publicSale-pendingOverbidAmount', 'transaction-sale-publicSale-hasUniqueSession', 'transaction-sale-publicSale-isForcedSale']
     
   #delete the columns selected and create new df's_n
-  if not df_ZIMMO.empty:
+  if not df_ZM.empty:
 
-    df_ZIMMO.drop(columns=del_zi, errors='ignore', inplace=True)
+    df_ZM.drop(columns=del_zi, errors='ignore', inplace=True)
     replace_zi={'':np.nan, None:np.nan}
-    df_ZIMMO.replace(replace_zi, regex=True, inplace=True)
+    df_ZM.replace(replace_zi, regex=True, inplace=True)
     
 
   if not df_IW.empty:
@@ -327,10 +327,10 @@ def delete_columns_rows(df_ZIMMO, df_IW):
     replace_iw={None:np.nan} 
     df_IW.replace(replace_iw, regex=True, inplace=True)
 
-  return df_ZIMMO, df_IW
+  return df_ZM, df_IW
 
 #FUNCTION TO RENAME THE COLUMNS IN SCRAPED DFS
-def rename_columns(df_ZIMMO, df_IW):
+def rename_columns(df_ZM, df_IW):
   
   #define the dict listing all the columns that need to be renamed:
 
@@ -346,75 +346,75 @@ def rename_columns(df_ZIMMO, df_IW):
              'price-additionalValue':'prijs_extra_kosten', 'price-oldValue':'oude_prijs'}
 
   
-  if not df_ZIMMO.empty:
-    df_ZIMMO.rename(columns=rename_zi, inplace=True)
+  if not df_ZM.empty:
+    df_ZM.rename(columns=rename_zi, inplace=True)
   if not df_IW.empty:
     df_IW.rename(columns=rename_iw, inplace=True)
   
-  return df_ZIMMO, df_IW
+  return df_ZM, df_IW
 
-#FUNCTION TO CLEAN THE DATA IN THE ZIMMO DF
-def clean_df_ZIMMO(df_ZIMMO, koop_huur, pand):
+#FUNCTION TO CLEAN THE DATA IN THE ZM DF
+def clean_df_ZM(df_ZM, koop_huur, pand):
 
-  if not df_ZIMMO.empty:
+  if not df_ZM.empty:
     for x in ['immo_privaat_zimmo', 'nieuwbouw', 'adres', 'gemeente', 'extra_info',
          'prijs_verlaagd', 'energielabel', 'dagen_online', 'adverteerder',
          'advertiser-name_prefix']:
-         df_ZIMMO[x] = df_ZIMMO[x].replace([np.nan], '')
+         df_ZM[x] = df_ZM[x].replace([np.nan], '')
 
     for x in ['woonopp', 'prijs']:
-         df_ZIMMO[x] = df_ZIMMO[x].str.replace('.', '')
-         df_ZIMMO[x] = df_ZIMMO[x].str.replace(',', '.')
+         df_ZM[x] = df_ZM[x].str.replace('.', '')
+         df_ZM[x] = df_ZM[x].str.replace(',', '.')
     
-    df_ZIMMO['nieuwbouw'].replace({'0':'bestaand', '1':'nieuwbouw'}, inplace=True)
+    df_ZM['nieuwbouw'].replace({'0':'bestaand', '1':'nieuwbouw'}, inplace=True)
   
-    df_ZIMMO['advertiser-name_prefix']=df_ZIMMO['advertiser-name_prefix'].str.replace('Geass. notarissen ', 'Notaris')
-    df_ZIMMO['dagen_online']=df_ZIMMO['dagen_online'].apply(lambda x: '1' if 'u' in x else x)
-    df_ZIMMO['dagen_online']=df_ZIMMO['dagen_online'].str.replace('d', '')
+    df_ZM['advertiser-name_prefix']=df_ZM['advertiser-name_prefix'].str.replace('Geass. notarissen ', 'Notaris')
+    df_ZM['dagen_online']=df_ZM['dagen_online'].apply(lambda x: '1' if 'u' in x else x)
+    df_ZM['dagen_online']=df_ZM['dagen_online'].str.replace('d', '')
   
-    #df_ZIMMO['adverteerder']=df_ZIMMO['immo_privaat_zimmo']+'_'+df_ZIMMO['adverteerder']+'_'+df_ZIMMO['advertiser-name_prefix']
-    df_ZIMMO['adverteerder']=df_ZIMMO['immo_privaat_zimmo']+df_ZIMMO['adverteerder']+df_ZIMMO['advertiser-name_prefix']
-    df_ZIMMO.drop(columns=['immo_privaat_zimmo','advertiser-name_prefix'], errors='ignore', inplace=True)
+    #df_ZM['adverteerder']=df_ZM['immo_privaat_zimmo']+'_'+df_ZM['adverteerder']+'_'+df_ZM['advertiser-name_prefix']
+    df_ZM['adverteerder']=df_ZM['immo_privaat_zimmo']+df_ZM['adverteerder']+df_ZM['advertiser-name_prefix']
+    df_ZM.drop(columns=['immo_privaat_zimmo','advertiser-name_prefix'], errors='ignore', inplace=True)
 
-    df_ZIMMO['extra_info']=df_ZIMMO['extra_info'].replace(['new'], '')
-    df_ZIMMO['prijs_verlaagd']=df_ZIMMO['prijs_verlaagd']+'_'+df_ZIMMO['extra_info']
-    df_ZIMMO.drop(columns=['extra_info'], errors='ignore', inplace=True)
+    df_ZM['extra_info']=df_ZM['extra_info'].replace(['new'], '')
+    df_ZM['prijs_verlaagd']=df_ZM['prijs_verlaagd']+'_'+df_ZM['extra_info']
+    df_ZM.drop(columns=['extra_info'], errors='ignore', inplace=True)
 
     dtypes_zi={'woonopp':float, 'slaapkamers':int, 'prijs':float, 'postcode':int,
              'lat':float, 'lon':float}
 
-    df_ZIMMO=df_ZIMMO.astype(dtypes_zi, errors='ignore')
+    df_ZM=df_ZM.astype(dtypes_zi, errors='ignore')
 
-    df_ZIMMO['pand']=koop_huur+' '+pand
+    df_ZM['pand']=koop_huur+' '+pand
 
     #flatten the propertyList dict in the column and add prijs/woonopp to correct column:
-    if 'propertyList' in df_ZIMMO.columns:
-      df_ZIMMO['prijs_proj']=[pd.json_normalize(x)['prijs_min'] if x is not np.nan else x is np.nan for x in df_ZIMMO['propertyList']]
-      df_ZIMMO['woonopp_proj']=[pd.json_normalize(x)['woon_oppervlakte_vanaf'] if x is not np.nan else x is np.nan for x in df_ZIMMO['propertyList']]
+    if 'propertyList' in df_ZM.columns:
+      df_ZM['prijs_proj']=[pd.json_normalize(x)['prijs_min'] if x is not np.nan else x is np.nan for x in df_ZM['propertyList']]
+      df_ZM['woonopp_proj']=[pd.json_normalize(x)['woon_oppervlakte_vanaf'] if x is not np.nan else x is np.nan for x in df_ZM['propertyList']]
 
-      df_ZIMMO['prijs']=df_ZIMMO[['prijs', 'prijs_proj']].min(numeric_only=True, axis=1)
-      df_ZIMMO['woonopp']=df_ZIMMO[['woonopp', 'woonopp_proj']].min(numeric_only=True, axis=1)
-      df_ZIMMO.drop(columns=['prijs_proj','woonopp_proj', 'propertyList'], errors='ignore', inplace=True)
+      df_ZM['prijs']=df_ZM[['prijs', 'prijs_proj']].min(numeric_only=True, axis=1)
+      df_ZM['woonopp']=df_ZM[['woonopp', 'woonopp_proj']].min(numeric_only=True, axis=1)
+      df_ZM.drop(columns=['prijs_proj','woonopp_proj', 'propertyList'], errors='ignore', inplace=True)
     
     
-    df_ZIMMO.dropna(subset=['prijs'])
-    df_ZIMMO.drop(df_ZIMMO[df_ZIMMO['prijs']==''].index, inplace=True)
-    df_ZIMMO.drop(df_ZIMMO[df_ZIMMO['prijs']=='0'].index, inplace=True)
-    df_ZIMMO.drop(df_ZIMMO[df_ZIMMO['prijs']==0].index, inplace=True)
+    df_ZM.dropna(subset=['prijs'])
+    df_ZM.drop(df_ZM[df_ZM['prijs']==''].index, inplace=True)
+    df_ZM.drop(df_ZM[df_ZM['prijs']=='0'].index, inplace=True)
+    df_ZM.drop(df_ZM[df_ZM['prijs']==0].index, inplace=True)
 
 
     #add a column prijs_m2 where possible and first ensure values are numeric:
-    df_ZIMMO['prijs_m2']=round(df_ZIMMO['prijs']/df_ZIMMO['woonopp'], 1)
+    df_ZM['prijs_m2']=round(df_ZM['prijs']/df_ZM['woonopp'], 1)
 
     
     #select the final columns for display and order them:
-    df_ZIMMO=df_ZIMMO[['pand','gemeente','postcode','adres','prijs','woonopp',
+    df_ZM=df_ZM[['pand','gemeente','postcode','adres','prijs','woonopp',
                        'prijs_m2','slaapkamers', 'prijs_verlaagd','energielabel',
                        'nieuwbouw','dagen_online','adverteerder']]
 
-    return df_ZIMMO
+    return df_ZM
   else:
-    return df_ZIMMO
+    return df_ZM
   
 #FUNCTION TO CLEAN THE DATA IN THE IW DF  
 def clean_df_IW(df_IW, koop_huur, pand):
@@ -505,8 +505,8 @@ if st.session_state.count==1:
   with st.spinner('BEZIG OM DE DATA VAN DE PANDEN TE VERZAMELEN ...'): 
     placeholder=st.empty()
     a, b= url_constructor(st.session_state.koop_huur, st.session_state.pand, st.session_state.hoofdgemeente)
-    df_ZIMMO_scrape=scrape_zi(a)
-    df_ZIMMO=copy.deepcopy(df_ZIMMO_scrape)
+    df_ZM_scrape=scrape_zi(a)
+    df_ZM=copy.deepcopy(df_ZM_scrape)
     placeholder.text('ONS OPZOEKWERK LOOPT...NOG EVEN GEDULD!')
     df_IW_scrape=scrape_iw(b)
     df_IW=copy.deepcopy(df_IW_scrape)
@@ -515,14 +515,14 @@ if st.session_state.count==1:
     df_IW_contact=copy.deepcopy(df_IW_contact_scrape)
     placeholder.text('DE DATA ZIJN VERZAMELD...DEZE GAAN WE NU ANALYSEREN!')
     df_IW=df_IW_concat (df_IW, df_IW_contact)
-    df_ZIMMO, df_IW=delete_columns_rows(df_ZIMMO, df_IW)
-    df_ZIMMO, df_IW=rename_columns(df_ZIMMO, df_IW)
-    df_ZIMMO=clean_df_ZIMMO(df_ZIMMO, st.session_state.koop_huur, st.session_state.pand)
+    df_ZM, df_IW=delete_columns_rows(df_ZM, df_IW)
+    df_ZM, df_IW=rename_columns(df_ZM, df_IW)
+    df_ZM=clean_df_ZM(df_ZM, st.session_state.koop_huur, st.session_state.pand)
     df_IW=clean_df_IW(df_IW, st.session_state.koop_huur, st.session_state.pand)
     placeholder.text('ALLES IS KLAAR...HIER ZIJN DE GEVRAAGDE PANDEN!')
     placeholder.empty()
     #we combine the two dataframes into one:
-    result_concat = pd.concat([df_ZIMMO, df_IW], ignore_index=True, sort=False)
+    result_concat = pd.concat([df_ZM, df_IW], ignore_index=True, sort=False)
     #we replace values in the concatenated df:
     df_n=result_concat.astype('string')
     df_n.replace({np.nan:'geen info', None:'geen info', pd.NA:'geen info'}, inplace=True)
