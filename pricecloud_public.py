@@ -21,88 +21,6 @@ from io import BytesIO
 
 #DEFINE ALL NEEDED FUNCTIONS
 
-#DEFINE EMAIL SENDING FUNCTION
-def send_email(to, attachment):
-  subject = "An email with attachment from Python"
-  body = "This is an email with attachment sent from Python"
-  sender_email = "info@pricecloud.be"
-  receiver_email = to
-  gmail_password = st.secrets["gmail_password"]
-  gmail_login=st.secrets["gmail_login"]
-  # Create a multipart message and set headers
-  message = MIMEMultipart()
-  message["From"] = sender_email
-  message["To"] = receiver_email
-  message["Subject"] = subject
-  #message["Bcc"] = receiver_email  # Recommended for mass emails
-
-  # Add body to email
-  message.attach(MIMEText(body, "plain"))
-
-  filename = attachment  # In same directory as script
-
-  # Open PDF file in binary mode
-  with open(filename, "rb") as attachment:
-    # Add file as application/octet-stream
-    # Email client can usually download this automatically as attachment
-    part = MIMEBase("application", "octet-stream")
-    part.set_payload(attachment.read())
-
-  # Encode file in ASCII characters to send by email    
-  encoders.encode_base64(part)
-
-  # Add header as key/value pair to attachment part
-  part.add_header(
-    "Content-Disposition",
-    f"attachment; filename= {filename}",
-  )
-
-  # Add attachment to message and convert message to string
-  message.attach(part)
-  text = message.as_string()
-
-  # Log in to server using secure context and send email
-  context = ssl.create_default_context()
-  with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-    server.login(gmail_login, gmail_password)
-    server.sendmail('info@pricecloud.be', receiver_email, text)         
-
-#ADD A LOGIN SECTION TO THE APP:
-def check_password():
-    """Returns `True` if the user had a correct password."""
-
-    def password_entered():
-        """Checks whether a password entered by the user is correct."""
-        if (
-            st.session_state["username"] in st.secrets["passwords"]
-            and st.session_state["password"]
-            == st.secrets["passwords"][st.session_state["username"]]
-        ):
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # don't store username + password
-            del st.session_state["username"]
-        else:
-            st.session_state["password_correct"] = False
-
-    if "password_correct" not in st.session_state:
-        # First run, show inputs for username + password.
-        st.text_input("Username", on_change=password_entered, key="username")
-        st.text_input(
-            "Password", type="password", on_change=password_entered, key="password"
-        )
-        return False
-    elif not st.session_state["password_correct"]:
-        # Password not correct, show input + error.
-        st.text_input("Username", on_change=password_entered, key="username")
-        st.text_input(
-            "Password", type="password", on_change=password_entered, key="password"
-        )
-        st.error("😕 User not known or password incorrect")
-        return False
-    else:
-        # Password correct.
-        return True
-
 #FUNCTION TO INCREMENT THE SESSION STATE
 def increment_counter():
     st.session_state.count += 1
@@ -115,20 +33,7 @@ def counter_reset():
 @st.cache(ttl=86400, show_spinner=False)
 def url_constructor (koop_huur, pand, hoofdgemeente):
 
-  """This function prepares the correct URL for 
-  
-  the first page to be scraped for each of the sites:
-  
-  ZIMMO (zi) and Immoweb (iw). 
-  
-  URL is based on search terms provided and search terms are in string format.
-  Search terms allowed are:
-  koop_huur='te-koop' or 'te-huur
-  pand='huis', 'appartement', 'garage', 'bedrijfsvastgoed' or 'grond'
-  hoofdgemeente=the city as str in capitals, eg 'AALST'
-  """
-
-  #define the URL part to reflect the pand type:
+    #define the URL part to reflect the pand type:
 
   if pand=='bedrijfsvastgoed':
     pand_zi, pand_iw=pand,'handelszaak'
@@ -578,77 +483,76 @@ def clean_df_IW(df_IW, koop_huur, pand):
   
 #HERE WE START THE EXECUTION OF THE FUNCTIONS BASED ON INPUT FROM USER
 #WE ASSIGN A SESSION STATE COUNTER AND PUT IN CACHE
-if check_password():
-  if 'count' not in st.session_state:
-    st.session_state.count = 0
-  if st.session_state.count==0:
-    st.header('Welkom op de PriceCloud vastgoed app!')
-    st.text('Maak een lijst van alle beschikbare panden in jouw regio!')
-    #we assign a tuple with names of hoofdgemeenten to choose from
-    with open('postcodes.pickle', 'rb') as f:
-      postcodes=pickle.load(f)
-    with st.sidebar:
-      with st.form('invulformulier'):
-        st.header('Van welke panden wens je een up-to-date lijst?')
-        pand=st.radio('Wat is het type vastgoed?', ['huis', 'appartement', 'garage', 'bedrijfsvastgoed', 'grond'], key='pand')
-        hoofdgemeente=st.selectbox('In welke gemeente is het pand gelegen?', list(set(postcodes.values())), key='hoofdgemeente')
-        koop_huur=st.radio('Te koop of te huur?', ['te-koop', 'te-huur'], key='koop_huur')
-        st.form_submit_button(label="Geef me de lijst", on_click=increment_counter)
-  if st.session_state.count==1:
-    st.session_state.pand=st.session_state.pand
-    st.session_state.hoofdgemeente=st.session_state.hoofdgemeente
-    st.session_state.koop_huur=st.session_state.koop_huur
-    with st.spinner('BEZIG OM DE DATA VAN DE PANDEN TE VERZAMELEN ...'): 
-      placeholder=st.empty()
-      a, b= url_constructor(st.session_state.koop_huur, st.session_state.pand, st.session_state.hoofdgemeente)
-      df_ZIMMO_scrape=scrape_zi(a)
-      df_ZIMMO=copy.deepcopy(df_ZIMMO_scrape)
-      placeholder.text('ONS OPZOEKWERK LOOPT...NOG EVEN GEDULD!')
-      df_IW_scrape=scrape_iw(b)
-      df_IW=copy.deepcopy(df_IW_scrape)
-      placeholder.text('WEERAL EEN STAP DICHTER...NOG EVEN GEDULD!')
-      df_IW_contact_scrape=scrape_IW_private(st.session_state.koop_huur, st.session_state.pand, df_IW)
-      df_IW_contact=copy.deepcopy(df_IW_contact_scrape)
-      placeholder.text('DE DATA ZIJN VERZAMELD...DEZE GAAN WE NU ANALYSEREN!')
-      df_IW=df_IW_concat (df_IW, df_IW_contact)
-      df_ZIMMO, df_IW=delete_columns_rows(df_ZIMMO, df_IW)
-      df_ZIMMO, df_IW=rename_columns(df_ZIMMO, df_IW)
-      df_ZIMMO=clean_df_ZIMMO(df_ZIMMO, st.session_state.koop_huur, st.session_state.pand)
-      df_IW=clean_df_IW(df_IW, st.session_state.koop_huur, st.session_state.pand)
-      placeholder.text('ALLES IS KLAAR...HIER ZIJN DE GEVRAAGDE PANDEN!')
-      placeholder.empty()
-      #we combine the two dataframes into one:
-      result_concat = pd.concat([df_ZIMMO, df_IW], ignore_index=True, sort=False)
-      #we replace values in the concatenated df:
-      df_n=result_concat.astype('string')
-      df_n.replace({np.nan:'geen info', None:'geen info', pd.NA:'geen info'}, inplace=True)
-      #we group by values to remove the duplicates:
-      g=df_n.groupby(['prijs_m2', 'prijs', 'adres']).agg(lambda x: ' '.join(x.unique())).reset_index(['prijs_m2', 'prijs', 'adres'])
-      g_fin=g.groupby(['prijs_m2', 'prijs']).agg(lambda x: ' '.join(x.unique())).reset_index(['prijs_m2', 'prijs'])
-      #we replace certain values:
-      lt=['prijs_m2', 'prijs', 'adres', 'pand', 'gemeente','postcode', 'woonopp',
-          'slaapkamers', 'prijs_verlaagd', 'energielabel','nieuwbouw', 'dagen_online',
-          'adverteerder', 'perceel_opp', 'prijs_extra_kosten', 'oude_prijs', 'extra_info']
-      replacers={'geen info': '', '_': ''}
-      for x in lt:
-        g_fin[x]=g_fin[x].str.replace('geen info', '')
-      g_fin['prijs_m2']=g_fin['prijs_m2'].replace('', np.nan).astype(float, errors='ignore')
-      g_fin['prijs']=g_fin['prijs'].replace('', np.nan).astype(float, errors='ignore')
-      g_fin['woonopp']=g_fin['woonopp'].replace('', np.nan).astype(float, errors='ignore')
-      g_fin['slaapkamers']=g_fin['slaapkamers'].replace('', np.nan).astype(float, errors='ignore')
-      g_fin['dagen_online']=g_fin['dagen_online'].replace('', np.nan).astype(float, errors='ignore')
-      g_fin['perceel_opp']=g_fin['perceel_opp'].replace('', np.nan).astype(float, errors='ignore')
-      g_fin['prijs_extra_kosten']=g_fin['prijs_extra_kosten'].replace('', np.nan).astype(float, errors='ignore')
-      g_fin['oude_prijs']=g_fin['oude_prijs'].replace('', np.nan).astype(float, errors='ignore')
-      g_fin.round(0)
-      #g_fin.style.format('{:.0f}')
-      st.dataframe(g_fin, use_container_width=True)
-      #prepare the Excel file for download:
-      output = BytesIO()
-      # Write files to in-memory strings using BytesIO
-      writer = pd.ExcelWriter(output, engine='xlsxwriter')
-      # Convert the dataframe to an XlsxWriter Excel object.
-      g_fin.to_excel(writer, sheet_name='Sheet1')
+if 'count' not in st.session_state:
+  st.session_state.count = 0
+if st.session_state.count==0:
+  st.header('Welkom op de PriceCloud vastgoed app!')
+  st.text('Maak een lijst van alle beschikbare panden in jouw regio!')
+  #we assign a tuple with names of hoofdgemeenten to choose from
+  with open('postcodes.pickle', 'rb') as f:
+    postcodes=pickle.load(f)
+  with st.sidebar:
+    with st.form('invulformulier'):
+      st.header('Van welke panden wens je een up-to-date lijst?')
+      pand=st.radio('Wat is het type vastgoed?', ['huis', 'appartement', 'garage', 'bedrijfsvastgoed', 'grond'], key='pand')
+      hoofdgemeente=st.selectbox('In welke gemeente is het pand gelegen?', list(set(postcodes.values())), key='hoofdgemeente')
+      koop_huur=st.radio('Te koop of te huur?', ['te-koop', 'te-huur'], key='koop_huur')
+      st.form_submit_button(label="Geef me de lijst", on_click=increment_counter
+if st.session_state.count==1:
+  st.session_state.pand=st.session_state.pand
+  st.session_state.hoofdgemeente=st.session_state.hoofdgemeente
+  st.session_state.koop_huur=st.session_state.koop_huur
+  with st.spinner('BEZIG OM DE DATA VAN DE PANDEN TE VERZAMELEN ...'): 
+    placeholder=st.empty()
+    a, b= url_constructor(st.session_state.koop_huur, st.session_state.pand, st.session_state.hoofdgemeente)
+    df_ZIMMO_scrape=scrape_zi(a)
+    df_ZIMMO=copy.deepcopy(df_ZIMMO_scrape)
+    placeholder.text('ONS OPZOEKWERK LOOPT...NOG EVEN GEDULD!')
+    df_IW_scrape=scrape_iw(b)
+    df_IW=copy.deepcopy(df_IW_scrape)
+    placeholder.text('WEERAL EEN STAP DICHTER...NOG EVEN GEDULD!')
+    df_IW_contact_scrape=scrape_IW_private(st.session_state.koop_huur, st.session_state.pand, df_IW)
+    df_IW_contact=copy.deepcopy(df_IW_contact_scrape)
+    placeholder.text('DE DATA ZIJN VERZAMELD...DEZE GAAN WE NU ANALYSEREN!')
+    df_IW=df_IW_concat (df_IW, df_IW_contact)
+    df_ZIMMO, df_IW=delete_columns_rows(df_ZIMMO, df_IW)
+    df_ZIMMO, df_IW=rename_columns(df_ZIMMO, df_IW)
+    df_ZIMMO=clean_df_ZIMMO(df_ZIMMO, st.session_state.koop_huur, st.session_state.pand)
+    df_IW=clean_df_IW(df_IW, st.session_state.koop_huur, st.session_state.pand)
+    placeholder.text('ALLES IS KLAAR...HIER ZIJN DE GEVRAAGDE PANDEN!')
+    placeholder.empty()
+    #we combine the two dataframes into one:
+    result_concat = pd.concat([df_ZIMMO, df_IW], ignore_index=True, sort=False)
+    #we replace values in the concatenated df:
+    df_n=result_concat.astype('string')
+    df_n.replace({np.nan:'geen info', None:'geen info', pd.NA:'geen info'}, inplace=True)
+    #we group by values to remove the duplicates:
+    g=df_n.groupby(['prijs_m2', 'prijs', 'adres']).agg(lambda x: ' '.join(x.unique())).reset_index(['prijs_m2', 'prijs', 'adres'])
+    g_fin=g.groupby(['prijs_m2', 'prijs']).agg(lambda x: ' '.join(x.unique())).reset_index(['prijs_m2', 'prijs'])
+    #we replace certain values:
+    lt=['prijs_m2', 'prijs', 'adres', 'pand', 'gemeente','postcode', 'woonopp',
+        'slaapkamers', 'prijs_verlaagd', 'energielabel','nieuwbouw', 'dagen_online',
+        'adverteerder', 'perceel_opp', 'prijs_extra_kosten', 'oude_prijs', 'extra_info']
+    replacers={'geen info': '', '_': ''}
+    for x in lt:
+      g_fin[x]=g_fin[x].str.replace('geen info', '')
+    g_fin['prijs_m2']=g_fin['prijs_m2'].replace('', np.nan).astype(float, errors='ignore')
+    g_fin['prijs']=g_fin['prijs'].replace('', np.nan).astype(float, errors='ignore')
+    g_fin['woonopp']=g_fin['woonopp'].replace('', np.nan).astype(float, errors='ignore')
+    g_fin['slaapkamers']=g_fin['slaapkamers'].replace('', np.nan).astype(float, errors='ignore')
+    g_fin['dagen_online']=g_fin['dagen_online'].replace('', np.nan).astype(float, errors='ignore')
+    g_fin['perceel_opp']=g_fin['perceel_opp'].replace('', np.nan).astype(float, errors='ignore')
+    g_fin['prijs_extra_kosten']=g_fin['prijs_extra_kosten'].replace('', np.nan).astype(float, errors='ignore')
+    g_fin['oude_prijs']=g_fin['oude_prijs'].replace('', np.nan).astype(float, errors='ignore')
+    g_fin.round(0)
+    #g_fin.style.format('{:.0f}')
+    st.dataframe(g_fin, use_container_width=True)
+    #prepare the Excel file for download:
+    output = BytesIO()
+    # Write files to in-memory strings using BytesIO
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    # Convert the dataframe to an XlsxWriter Excel object.
+    g_fin.to_excel(writer, sheet_name='Sheet1')
       writer.close()
       st.download_button(label="Download Excel workbook",
                          data=output.getvalue(),
