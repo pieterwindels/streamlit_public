@@ -7,7 +7,6 @@ import random
 import json
 import pandas as pd
 import numpy as np
-import pickle
 import copy
 import ssl
 from email.message import EmailMessage
@@ -18,6 +17,38 @@ from email.mime.text import MIMEText
 from email import encoders
 import xlsxwriter
 from io import BytesIO
+
+#DEFINE POSTCODES:
+postcodes={'1540': 'HERNE',
+           '1541': 'HERNE',
+           '1740': 'TERNAT',
+           '1741': 'TERNAT',
+           '1742': 'TERNAT',
+           '1790': 'AFFLIGEM',
+           '3020': 'HERENT',
+           '3380': 'GLABBEEK',
+           '3381': 'GLABBEEK',
+           '3384': 'GLABBEEK',
+           '2070': 'ZWIJNDRECHT',
+           '2110': 'WIJNEGEM',
+           '2340': 'BEERSE',
+           '2590': 'BERLAAR',
+           '2820': 'BONHEIDEN',
+           '2930': 'BRASSCHAAT',
+           '3680': 'MAASEIK',
+           '3870': 'HEERS',
+           '3970': 'LEOPOLDSBURG',
+           '3971': 'LEOPOLDSBURG',
+           '8480': 'ICHTEGEM',
+           '8700': 'TIELT',
+           '8810': 'LICHTERVELDE',
+           '8820': 'TORHOUT',
+           '9060': 'ZELZATE',
+           '9070': 'DESTELBERGEN',
+           '9420': 'ERPE-MERE',
+           '9450': 'HAALTERT',
+           '9451': 'HAALTERT',
+           '9700': 'OUDENAARDE'}
 
 #DEFINE ALL NEEDED FUNCTIONS
 
@@ -40,11 +71,6 @@ def url_constructor (koop_huur, pand, hoofdgemeente):
   else:
     pand_zi, pand_iw=pand, pand
 
-  #import the dictionary from pickle file:
-
-  with open('postcodes_public.pickle', 'rb') as f:
-    postcodes=pickle.load(f)
-  
   #define the URL part (as string) to reflect the hoofdgemeente (we use the postcodes dictionary):
 
   hoofdgemeente_iw=''.join([k+',' for k,v in postcodes.items() if v==hoofdgemeente]).strip(',')
@@ -489,14 +515,12 @@ if st.session_state.count==0:
   st.header('Welkom op de PriceCloud vastgoed app!')
   st.text('Maak een lijst van alle beschikbare panden in jouw regio!')
   #we assign a tuple with names of hoofdgemeenten to choose from
-  with open('postcodes_public.pickle', 'rb') as f:
-    postcodes=pickle.load(f)
   with st.sidebar:
     with st.form('invulformulier'):
       st.header('Van welke panden wens je een up-to-date lijst?')
       pand=st.radio('Wat is het type vastgoed?', ['huis', 'appartement', 'garage', 'bedrijfsvastgoed', 'grond'], key='pand')
       hoofdgemeente=st.selectbox('In welke gemeente is het pand gelegen?', list(set(postcodes.values())), key='hoofdgemeente',
-                                help='In this trial version only a few options can be selected, in the paid version all options are visible.')
+                                 help='In this trial version only a few options can be selected, in the paid version all options are visible.')
       koop_huur=st.radio('Te koop of te huur?', ['te-koop', 'te-huur'], key='koop_huur')
       st.form_submit_button(label="Geef me de lijst", on_click=increment_counter)
 if st.session_state.count==1:
