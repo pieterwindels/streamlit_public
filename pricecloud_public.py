@@ -489,7 +489,7 @@ if st.session_state.count==0:
   st.header('Welkom op de PriceCloud vastgoed app!')
   st.text('Maak een lijst van alle beschikbare panden in jouw regio!')
   #we assign a tuple with names of hoofdgemeenten to choose from
-  with open('postcodes.pickle', 'rb') as f:
+  with open('postcodes_public.pickle', 'rb') as f:
     postcodes=pickle.load(f)
   with st.sidebar:
     with st.form('invulformulier'):
