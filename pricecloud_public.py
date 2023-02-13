@@ -495,7 +495,8 @@ if st.session_state.count==0:
     with st.form('invulformulier'):
       st.header('Van welke panden wens je een up-to-date lijst?')
       pand=st.radio('Wat is het type vastgoed?', ['huis', 'appartement', 'garage', 'bedrijfsvastgoed', 'grond'], key='pand')
-      hoofdgemeente=st.selectbox('In welke gemeente is het pand gelegen?', list(set(postcodes.values())), key='hoofdgemeente')
+      hoofdgemeente=st.selectbox('In welke gemeente is het pand gelegen?', list(set(postcodes.values())), key='hoofdgemeente',
+                                help='In this trial version only a few options can be selected,/n in the paid version all options are visible.)
       koop_huur=st.radio('Te koop of te huur?', ['te-koop', 'te-huur'], key='koop_huur')
       st.form_submit_button(label="Geef me de lijst", on_click=increment_counter)
 if st.session_state.count==1:
