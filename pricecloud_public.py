@@ -234,12 +234,13 @@ def scrape_iw(url_iw):
     df_IW=pd.DataFrame({})
     return df_IW
   #combine the different data sets into one single list of dicts. Each dict represents all values for a property.
-  vastgoed_data_IW=[]
-  for item in vastgoed_data:
-    for dictionary in item:
-      vastgoed_data_IW.append(dictionary)
-  df_IW=pd.json_normalize(vastgoed_data_IW, sep='-')
-  return df_IW
+  try:
+    vastgoed_data_IW=[]
+    for item in vastgoed_data:
+      for dictionary in item:
+        vastgoed_data_IW.append(dictionary)
+    df_IW=pd.json_normalize(vastgoed_data_IW, sep='-')
+    return df_IW
 
 #FUNCTION TO SCRAPE THE PRIVATE IW PHONE NRS
 @st.cache(ttl=86400, show_spinner=False)
