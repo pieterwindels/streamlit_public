@@ -241,6 +241,9 @@ def scrape_iw(url_iw):
         vastgoed_data_IW.append(dictionary)
     df_IW=pd.json_normalize(vastgoed_data_IW, sep='-')
     return df_IW
+  except Exception as e:
+    df_IW=pd.DataFrame({})
+    return df_IW  
 
 #FUNCTION TO SCRAPE THE PRIVATE IW PHONE NRS
 @st.cache(ttl=86400, show_spinner=False)
