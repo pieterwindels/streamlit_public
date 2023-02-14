@@ -113,8 +113,8 @@ if st.session_state.count==1:
         g_fin.round(0)
         
         st._legacy_dataframe(g_fin.style
-                             .format('€{0:..0f} ', precision=0, na_rep='geen info', subset=['prijs_m2', 'prijs', 'prijs_extra_kosten', 'oude_prijs'])
-                             .format('{0:..0f}', precision=0, subset=['woonopp', 'slaapkamers']))
+                             .format('€{0:.0f} ', precision=0, na_rep='geen info', subset=['prijs_m2', 'prijs', 'prijs_extra_kosten', 'oude_prijs'])
+                             .format('{0:.0f}', precision=0, subset=['woonopp', 'slaapkamers']))
         
         #prepare the Excel file for download:
         output = BytesIO()
