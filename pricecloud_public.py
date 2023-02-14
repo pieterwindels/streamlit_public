@@ -112,7 +112,7 @@ if st.session_state.count==1:
         g_fin['oude_prijs']=g_fin['oude_prijs'].replace('', np.nan).astype(float, errors='ignore')
         g_fin.round(0)
         #g_fin.style.format('{:.0f}')
-        st.dataframe(g_fin, use_container_width=True)
+        st.dataframe(g_fin)
         #prepare the Excel file for download:
         output = BytesIO()
         # Write files to in-memory strings using BytesIO
