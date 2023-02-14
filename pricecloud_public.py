@@ -68,7 +68,7 @@ if st.session_state.count==1:
   with st.spinner('BEZIG OM DE DATA VAN DE PANDEN TE VERZAMELEN ...'): 
     placeholder=st.empty()
     a, b= url_constructor.url_constructor(st.session_state.koop_huur, st.session_state.pand, st.session_state.hoofdgemeente)
-    df_ZM_scrape, aantal_pg=scrape_zi.scrape_zi(a)
+    df_ZM_scrape=scrape_zi.scrape_zi(a)
     df_ZM=copy.deepcopy(df_ZM_scrape)
     placeholder.text('ONS OPZOEKWERK LOOPT...NOG EVEN GEDULD!')
     df_IW_scrape=scrape_iw.scrape_iw(b)
@@ -76,8 +76,7 @@ if st.session_state.count==1:
     if df_ZM.empty and df_IW.empty:
         st.write('er zijn geen panden')
     else:
-        st.dataframe(df_ZM)
-        st.write(aantal_pg)
+        st.dataframe(df_ZM_scrape)
         st.dataframe(df_IW)
 '''     
         placeholder.text('WEERAL EEN STAP DICHTER...NOG EVEN GEDULD!')
