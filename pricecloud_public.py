@@ -116,6 +116,8 @@ if st.session_state.count==1:
                              .format('€{:.0f}', subset=['prijs_m2', 'prijs', 'prijs_extra_kosten', 'oude_prijs'])
                              .format('{:.0f}m²', subset=['woonopp']))
         
+        st.bar_chart(g_fin['prijs_m2'])
+        
         #prepare the Excel file for download:
         output = BytesIO()
         # Write files to in-memory strings using BytesIO
