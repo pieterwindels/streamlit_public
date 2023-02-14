@@ -107,4 +107,4 @@ def scrape_zi(url_zi):
       else:
         continue 
   df_ZM=pd.json_normalize(vastgoed_data_ZM, sep='-')
-  return df_ZM
+  return df_ZM, aantal_pg
