@@ -77,9 +77,8 @@ if st.session_state.count==1:
         st.write('er zijn geen panden')
     else:
         st.dataframe(df_ZM)
-        st.dataframe(df_IW
-        
-   '''     
+        st.dataframe(df_IW)
+'''     
         placeholder.text('WEERAL EEN STAP DICHTER...NOG EVEN GEDULD!')
         df_IW_contact_scrape=scrape_IW_private.scrape_IW_private(st.session_state.koop_huur, st.session_state.pand, df_IW)
         df_IW_contact=copy.deepcopy(df_IW_contact_scrape)
@@ -133,4 +132,4 @@ if st.session_state.count==1:
                            data=output.getvalue(),
                            file_name="pandas_simple.xlsx",
                            mime="application/vnd.ms-excel")
- '''
+'''
