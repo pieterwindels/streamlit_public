@@ -1,3 +1,12 @@
+#IMPORT THE MODULES WE NEED
+import requests
+from bs4 import BeautifulSoup as bs
+import time
+import random
+import json
+import pandas as pd
+import numpy as np
+
 #FUNCTION TO SCRAPE THE PRIVATE IW PHONE NRS
 
 def scrape_IW_private(koop_huur, pand, df):
