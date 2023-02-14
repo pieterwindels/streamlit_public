@@ -1,3 +1,6 @@
+import pandas as pd
+import numpy as np
+
 #FUNCTION TO RENAME THE COLUMNS IN SCRAPED DFS
 def rename_columns(df_ZM, df_IW):
   
