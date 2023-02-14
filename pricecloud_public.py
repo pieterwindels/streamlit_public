@@ -30,6 +30,7 @@ import clean_df_ZM
 
 scrape_zi=st.cache(scrape_zi, ttl=86400, show_spinner=False)
 scrape_iw=st.cache(scrape_iw, ttl=86400, show_spinner=False)
+scrape_IW_private=st.cache(scrape_IW_private, ttl=86400, show_spinner=False)
 
 #DEFINE ALL NEEDED FUNCTIONS
 
@@ -77,46 +78,49 @@ if st.session_state.count==1:
     df_IW_contact=copy.deepcopy(df_IW_contact_scrape)
     placeholder.text('DE DATA ZIJN VERZAMELD...DEZE GAAN WE NU ANALYSEREN!')
     df_IW=df_IW_concat.df_IW_concat (df_IW, df_IW_contact)
-    df_ZM, df_IW=delete_columns_rows.delete_columns_rows(df_ZM, df_IW)
-    df_ZM, df_IW=rename_columns.rename_columns(df_ZM, df_IW)
-    df_ZM=clean_df_ZM.clean_df_ZM(df_ZM, st.session_state.koop_huur, st.session_state.pand)
-    df_IW=clean_df_IW.clean_df_IW(df_IW, st.session_state.koop_huur, st.session_state.pand)
-    placeholder.text('ALLES IS KLAAR...HIER ZIJN DE GEVRAAGDE PANDEN!')
-    placeholder.empty()
-    #we combine the two dataframes into one:
-    result_concat = pd.concat([df_ZM, df_IW], ignore_index=True, sort=False)
-    #we replace values in the concatenated df:
-    df_n=result_concat.astype('string')
-    df_n.replace({np.nan:'geen info', None:'geen info', pd.NA:'geen info'}, inplace=True)
-    #we group by values to remove the duplicates:
-    g=df_n.groupby(['prijs_m2', 'prijs', 'adres']).agg(lambda x: ' '.join(x.unique())).reset_index(['prijs_m2', 'prijs', 'adres'])
-    g_fin=g.groupby(['prijs_m2', 'prijs']).agg(lambda x: ' '.join(x.unique())).reset_index(['prijs_m2', 'prijs'])
-    #we replace certain values:
-    lt=['prijs_m2', 'prijs', 'adres', 'pand', 'gemeente','postcode', 'woonopp',
-        'slaapkamers', 'prijs_verlaagd', 'energielabel','nieuwbouw', 'dagen_online',
-        'adverteerder', 'perceel_opp', 'prijs_extra_kosten', 'oude_prijs', 'extra_info']
-    replacers={'geen info': '', '_': ''}
-    for x in lt:
-      g_fin[x]=g_fin[x].str.replace('geen info', '')
-    g_fin['prijs_m2']=g_fin['prijs_m2'].replace('', np.nan).astype(float, errors='ignore')
-    g_fin['prijs']=g_fin['prijs'].replace('', np.nan).astype(float, errors='ignore')
-    g_fin['woonopp']=g_fin['woonopp'].replace('', np.nan).astype(float, errors='ignore')
-    g_fin['slaapkamers']=g_fin['slaapkamers'].replace('', np.nan).astype(float, errors='ignore')
-    g_fin['dagen_online']=g_fin['dagen_online'].replace('', np.nan).astype(float, errors='ignore')
-    g_fin['perceel_opp']=g_fin['perceel_opp'].replace('', np.nan).astype(float, errors='ignore')
-    g_fin['prijs_extra_kosten']=g_fin['prijs_extra_kosten'].replace('', np.nan).astype(float, errors='ignore')
-    g_fin['oude_prijs']=g_fin['oude_prijs'].replace('', np.nan).astype(float, errors='ignore')
-    g_fin.round(0)
-    #g_fin.style.format('{:.0f}')
-    st.dataframe(g_fin, use_container_width=True)
-    #prepare the Excel file for download:
-    output = BytesIO()
-    # Write files to in-memory strings using BytesIO
-    writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    # Convert the dataframe to an XlsxWriter Excel object.
-    g_fin.to_excel(writer, sheet_name='Sheet1')
-    writer.close()
-    st.download_button(label="Download Excel workbook",
-                       data=output.getvalue(),
-                       file_name="pandas_simple.xlsx",
-                       mime="application/vnd.ms-excel")
+    if df_ZM.empty and df_IW.empty:
+        st.write('er zijn geen panden')
+    else:
+        df_ZM, df_IW=delete_columns_rows.delete_columns_rows(df_ZM, df_IW)
+        df_ZM, df_IW=rename_columns.rename_columns(df_ZM, df_IW)
+        df_ZM=clean_df_ZM.clean_df_ZM(df_ZM, st.session_state.koop_huur, st.session_state.pand)
+        df_IW=clean_df_IW.clean_df_IW(df_IW, st.session_state.koop_huur, st.session_state.pand)
+        placeholder.text('ALLES IS KLAAR...HIER ZIJN DE GEVRAAGDE PANDEN!')
+        placeholder.empty()
+        #we combine the two dataframes into one:
+        result_concat = pd.concat([df_ZM, df_IW], ignore_index=True, sort=False)
+        #we replace values in the concatenated df:
+        df_n=result_concat.astype('string')
+        df_n.replace({np.nan:'geen info', None:'geen info', pd.NA:'geen info'}, inplace=True)
+        #we group by values to remove the duplicates:
+        g=df_n.groupby(['prijs_m2', 'prijs', 'adres']).agg(lambda x: ' '.join(x.unique())).reset_index(['prijs_m2', 'prijs', 'adres'])
+        g_fin=g.groupby(['prijs_m2', 'prijs']).agg(lambda x: ' '.join(x.unique())).reset_index(['prijs_m2', 'prijs'])
+        #we replace certain values:
+        lt=['prijs_m2', 'prijs', 'adres', 'pand', 'gemeente','postcode', 'woonopp',
+            'slaapkamers', 'prijs_verlaagd', 'energielabel','nieuwbouw', 'dagen_online',
+            'adverteerder', 'perceel_opp', 'prijs_extra_kosten', 'oude_prijs', 'extra_info']
+        replacers={'geen info': '', '_': ''}
+        for x in lt:
+          g_fin[x]=g_fin[x].str.replace('geen info', '')
+        g_fin['prijs_m2']=g_fin['prijs_m2'].replace('', np.nan).astype(float, errors='ignore')
+        g_fin['prijs']=g_fin['prijs'].replace('', np.nan).astype(float, errors='ignore')
+        g_fin['woonopp']=g_fin['woonopp'].replace('', np.nan).astype(float, errors='ignore')
+        g_fin['slaapkamers']=g_fin['slaapkamers'].replace('', np.nan).astype(float, errors='ignore')
+        g_fin['dagen_online']=g_fin['dagen_online'].replace('', np.nan).astype(float, errors='ignore')
+        g_fin['perceel_opp']=g_fin['perceel_opp'].replace('', np.nan).astype(float, errors='ignore')
+        g_fin['prijs_extra_kosten']=g_fin['prijs_extra_kosten'].replace('', np.nan).astype(float, errors='ignore')
+        g_fin['oude_prijs']=g_fin['oude_prijs'].replace('', np.nan).astype(float, errors='ignore')
+        g_fin.round(0)
+        #g_fin.style.format('{:.0f}')
+        st.dataframe(g_fin, use_container_width=True)
+        #prepare the Excel file for download:
+        output = BytesIO()
+        # Write files to in-memory strings using BytesIO
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')
+        # Convert the dataframe to an XlsxWriter Excel object.
+        g_fin.to_excel(writer, sheet_name='Sheet1')
+        writer.close()
+        st.download_button(label="Download Excel workbook",
+                           data=output.getvalue(),
+                           file_name="pandas_simple.xlsx",
+                           mime="application/vnd.ms-excel")
