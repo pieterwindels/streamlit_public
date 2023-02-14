@@ -1,5 +1,5 @@
 #FUNCTION TO SCRAPE THE PRIVATE IW PHONE NRS
-@st.cache(ttl=86400, show_spinner=False)
+
 def scrape_IW_private(koop_huur, pand, df):
 
   headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.81 Safari/537.36'}
