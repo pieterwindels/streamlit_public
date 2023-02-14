@@ -1,5 +1,5 @@
 #FUNCTION TO CONSTRUCT SEARCH URL
-@st.cache(ttl=86400, show_spinner=False)
+
 def url_constructor (koop_huur, pand, hoofdgemeente):
 
   #define the URL part to reflect the pand type:
