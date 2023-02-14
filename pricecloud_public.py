@@ -28,6 +28,7 @@ import rename_columns
 import clean_df_IW
 import clean_df_ZM
 
+scrape_zi=st.cache(scrape_zi, ttl=86400, show_spinner=False)
 
 #DEFINE ALL NEEDED FUNCTIONS
 
