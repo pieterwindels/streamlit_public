@@ -18,6 +18,16 @@ from email import encoders
 import xlsxwriter
 from io import BytesIO
 
+import url_constructor
+import scrape_zi
+import scrape_iw
+import scrape_IW_private
+import df_IW_concat
+import delete_columns_rows
+import rename_columns
+import clean_df_IW
+import clean_df_ZM
+
 
 #DEFINE ALL NEEDED FUNCTIONS
 
@@ -31,6 +41,9 @@ def counter_reset():
   
 #HERE WE START THE EXECUTION OF THE FUNCTIONS BASED ON INPUT FROM USER
 #WE ASSIGN A SESSION STATE COUNTER AND PUT IN CACHE
+with open('postcodes.txt', 'r') as f:
+    data=f.read()
+    postcodes=json.loads(data)
 if 'count' not in st.session_state:
   st.session_state.count = 0
 if st.session_state.count==0:
@@ -51,21 +64,21 @@ if st.session_state.count==1:
   st.session_state.koop_huur=st.session_state.koop_huur
   with st.spinner('BEZIG OM DE DATA VAN DE PANDEN TE VERZAMELEN ...'): 
     placeholder=st.empty()
-    a, b= url_constructor(st.session_state.koop_huur, st.session_state.pand, st.session_state.hoofdgemeente)
-    df_ZM_scrape=scrape_zi(a)
+    a, b= url_constructor.url_constructor(st.session_state.koop_huur, st.session_state.pand, st.session_state.hoofdgemeente)
+    df_ZM_scrape=scrape_zi.scrape_zi(a)
     df_ZM=copy.deepcopy(df_ZM_scrape)
     placeholder.text('ONS OPZOEKWERK LOOPT...NOG EVEN GEDULD!')
-    df_IW_scrape=scrape_iw(b)
+    df_IW_scrape=scrape_iw.scrape_iw(b)
     df_IW=copy.deepcopy(df_IW_scrape)
     placeholder.text('WEERAL EEN STAP DICHTER...NOG EVEN GEDULD!')
-    df_IW_contact_scrape=scrape_IW_private(st.session_state.koop_huur, st.session_state.pand, df_IW)
+    df_IW_contact_scrape=scrape_IW_private.scrape_IW_private(st.session_state.koop_huur, st.session_state.pand, df_IW)
     df_IW_contact=copy.deepcopy(df_IW_contact_scrape)
     placeholder.text('DE DATA ZIJN VERZAMELD...DEZE GAAN WE NU ANALYSEREN!')
-    df_IW=df_IW_concat (df_IW, df_IW_contact)
-    df_ZM, df_IW=delete_columns_rows(df_ZM, df_IW)
-    df_ZM, df_IW=rename_columns(df_ZM, df_IW)
-    df_ZM=clean_df_ZM(df_ZM, st.session_state.koop_huur, st.session_state.pand)
-    df_IW=clean_df_IW(df_IW, st.session_state.koop_huur, st.session_state.pand)
+    df_IW=df_IW_concat.df_IW_concat (df_IW, df_IW_contact)
+    df_ZM, df_IW=delete_columns_rows.delete_columns_rows(df_ZM, df_IW)
+    df_ZM, df_IW=rename_columns.rename_columns(df_ZM, df_IW)
+    df_ZM=clean_df_ZM.clean_df_ZM(df_ZM, st.session_state.koop_huur, st.session_state.pand)
+    df_IW=clean_df_IW.clean_df_IW(df_IW, st.session_state.koop_huur, st.session_state.pand)
     placeholder.text('ALLES IS KLAAR...HIER ZIJN DE GEVRAAGDE PANDEN!')
     placeholder.empty()
     #we combine the two dataframes into one:
