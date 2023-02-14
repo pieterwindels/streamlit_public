@@ -44,7 +44,7 @@ def counter_reset():
 #WE ASSIGN A SESSION STATE COUNTER AND PUT IN CACHE
 with open('postcodes.txt', 'r') as f:
     data=f.read()
-    postcodes=json.loads(data)
+    postcodes=json.loads(data.replace("'",'"')))
 if 'count' not in st.session_state:
   st.session_state.count = 0
 if st.session_state.count==0:
