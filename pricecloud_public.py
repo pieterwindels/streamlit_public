@@ -113,7 +113,7 @@ if st.session_state.count==1:
         g_fin.round(0)
         
         st._legacy_dataframe(g_fin.style
-                             .format('€{:.0f} ', subset=['prijs_m2', 'prijs', 'prijs_extra_kosten', 'oude_prijs']))
+                             .format('€{:.0f} ', subset=['prijs_m2', 'prijs', 'prijs_extra_kosten', 'oude_prijs'])
                              .format(precision=0, subset=['woonopp']))
         
         #prepare the Excel file for download:
