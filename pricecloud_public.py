@@ -112,7 +112,7 @@ if st.session_state.count==1:
         g_fin['oude_prijs']=g_fin['oude_prijs'].replace('', np.nan).astype(float, errors='ignore')
         g_fin.round(0)
         g_fin.style.format('$ {:.1f}', decimal=',' , precision=0, subset=['prijs_m2', 'prijs', 'prijs_extra_kosten', 'oude_prijs'])
-        st.dataframe(g_fin)
+        st._legacy_dataframe(g_fin)
         #prepare the Excel file for download:
         output = BytesIO()
         # Write files to in-memory strings using BytesIO
