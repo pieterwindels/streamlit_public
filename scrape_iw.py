@@ -1,5 +1,5 @@
 #IMPORT THE MODULES WE NEED
-import streamlt as st
+import streamlit as st
 import requests
 from bs4 import BeautifulSoup as bs
 import time
