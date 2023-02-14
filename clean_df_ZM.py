@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+import json
+
 #FUNCTION TO CLEAN THE DATA IN THE ZM DF
 def clean_df_ZM(df_ZM, koop_huur, pand):
 
