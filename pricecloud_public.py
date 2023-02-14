@@ -111,7 +111,7 @@ if st.session_state.count==1:
         g_fin['prijs_extra_kosten']=g_fin['prijs_extra_kosten'].replace('', np.nan).astype(float, errors='ignore')
         g_fin['oude_prijs']=g_fin['oude_prijs'].replace('', np.nan).astype(float, errors='ignore')
         g_fin.round(0)
-        g_fin.style.format(precision=1)
+        g_fin.style.format(decimal=',' , precision=0)
         st.dataframe(g_fin)
         #prepare the Excel file for download:
         output = BytesIO()
