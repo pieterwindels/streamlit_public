@@ -1,3 +1,6 @@
+import pandas as pd
+import numpy as np
+
 #FUNCTION TO DELETE COLUMNS NOT NEEDED IN SCRAPED DFS
 def delete_columns_rows(df_ZM, df_IW):
   
