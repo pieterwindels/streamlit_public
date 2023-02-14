@@ -1,3 +1,6 @@
+import pandas as pd
+import json
+import numpy as np
 
 #FUNCTION TO CLEAN THE DATA IN THE IW DF  
 def clean_df_IW(df_IW, koop_huur, pand):
