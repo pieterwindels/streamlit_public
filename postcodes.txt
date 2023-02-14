@@ -1,4 +1,4 @@
-postcodes={'1540': 'HERNE',
+{'1540': 'HERNE',
            '1541': 'HERNE',
            '1740': 'TERNAT',
            '1741': 'TERNAT',
