@@ -1,4 +1,5 @@
 #FUNCTION TO CONSTRUCT SEARCH URL
+import json
 
 def url_constructor (koop_huur, pand, hoofdgemeente):
   
