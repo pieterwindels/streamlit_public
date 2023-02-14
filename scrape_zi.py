@@ -1,4 +1,5 @@
 #IMPORT THE MODULES WE NEED
+import streamlit as st
 import requests
 from bs4 import BeautifulSoup as bs
 import time
@@ -8,7 +9,7 @@ import pandas as pd
 import numpy as np
 
 #FUNCTION TO SCRAPE THE SELECTED ZM PAGES
-
+@st.cache(ttl=86400, show_spinner=False)
 def scrape_zi(url_zi):
   """This function scrapes all the zimmo pages that have real estate 
   
