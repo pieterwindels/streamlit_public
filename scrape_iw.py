@@ -1,4 +1,5 @@
 #IMPORT THE MODULES WE NEED
+import streamlt as st
 import requests
 from bs4 import BeautifulSoup as bs
 import time
@@ -8,7 +9,7 @@ import pandas as pd
 import numpy as np
 
 #FUNCTION TO SCRAPE THE SELECTED IW PAGES
-
+@st.cache(ttl=86400, show_spinner=False)
 def scrape_iw(url_iw):
   """This function scrapes all the immoweb pages that have real estate 
   
