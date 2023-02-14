@@ -1,6 +1,10 @@
 #FUNCTION TO CONSTRUCT SEARCH URL
 
 def url_constructor (koop_huur, pand, hoofdgemeente):
+  
+  with open('postcodes.txt', 'r') as f:
+    data=f.read()
+    postcodes=json.loads(data.replace("'",'"'))
 
   #define the URL part to reflect the pand type:
 
