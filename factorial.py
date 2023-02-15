@@ -1,5 +1,6 @@
 import streamlit as st
 import time
+@st.cache()
 def fact(num):
   i=0
   while i<num:
