@@ -28,10 +28,6 @@ import rename_columns
 import clean_df_IW
 import clean_df_ZM
 
-scrape_zi=st.cache(scrape_zi, ttl=86400, show_spinner=False)
-scrape_iw=st.cache(scrape_iw, ttl=86400, show_spinner=False)
-scrape_IW_private=st.cache(scrape_IW_private, ttl=86400, show_spinner=False)
-
 #DEFINE ALL NEEDED FUNCTIONS
 
 #FUNCTION TO INCREMENT THE SESSION STATE
@@ -116,7 +112,7 @@ if st.session_state.count==1:
                              .format('€{:.0f}', subset=['prijs_m2', 'prijs', 'prijs_extra_kosten', 'oude_prijs'])
                              .format('{:.0f}m²', subset=['woonopp']))
         
-        #st.bar_chart(g_fin['prijs_m2'])
+        st.bar_chart(g_fin['prijs_m2'])
         
         #prepare the Excel file for download:
         output = BytesIO()
