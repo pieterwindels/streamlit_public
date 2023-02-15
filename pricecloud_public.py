@@ -76,7 +76,7 @@ if st.session_state.count==1:
     if df_ZM.empty and df_IW.empty:
         st.write('er zijn geen panden')
     else:
-        st.write(type(df_ZM_scrape))
+        st.dataframe(df_ZM)
         st.dataframe(df_IW)
 '''     
         placeholder.text('WEERAL EEN STAP DICHTER...NOG EVEN GEDULD!')
