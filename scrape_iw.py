@@ -50,7 +50,7 @@ def scrape_iw(url_iw):
       #we collect all the following pages
       while ct<=int(aantal_pg):
         try:
-          time.sleep(random.randint(1,4)
+          time.sleep(random.randint(1,4))
           url=url_iw.replace('1&orderBy=relevance', str(ct)+'&orderBy=relevance')
           page = requests.get(url, headers = random.choice(header_list))
           text=page.text
