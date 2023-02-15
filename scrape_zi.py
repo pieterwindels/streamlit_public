@@ -66,7 +66,7 @@ def scrape_zi(url_zi):
       #scrape the real estate date from all following pages: 
       while ct<=int(aantal_pg):
         try:
-          time.sleep(random.randint(2,5))
+          time.sleep(random.randint(1,4))
           url=url_zi.strip('#gallery')+'?search='+url_attach+str(ct)+'#gallery'
           page = s.get(url, headers = headers, timeout=6)
           soup=bs(page.text, 'html.parser')
@@ -82,8 +82,8 @@ def scrape_zi(url_zi):
             else:
               vastgoed['property_code'].append(None)
           ct=ct+1
-          if (ct==8 or ct==15 or ct==23 or ct==32):
-            time.sleep(10) 
+          if (ct==8 or ct==15 or ct==23 or ct==32 or ct==42):
+            time.sleep(5) 
         except Exception as e:
           df_ZM=pd.DataFrame({})
           return df_ZM
