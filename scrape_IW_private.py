@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 
 #FUNCTION TO SCRAPE THE PRIVATE IW PHONE NRS
-@st.cache(ttl=108000, show_spinner=False)
+@st.cache_data(ttl=108000, show_spinner=False)
 def scrape_IW_private(koop_huur, pand, df):
   
   if not df.empty:
