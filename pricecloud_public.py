@@ -100,7 +100,10 @@ if st.session_state.count==1:
           g_fin[x]=g_fin[x].str.replace('geen info', '')
         #we ensure that for the floats (and for gemeente) that we want there are no duplicates in the row coming from the groupby function:
         def part(x):
-          return x.partition(' ')[0]
+            if x!=np.nan:
+              return x.partition(' ')[0]
+            else:
+              return x
         
         g_fin['gemeente']=g_fin['gemeente'].map(part)
         
