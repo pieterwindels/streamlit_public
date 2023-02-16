@@ -98,10 +98,12 @@ if st.session_state.count==1:
         replacers={'geen info': '', '_': ''}
         for x in lt:
           g_fin[x]=g_fin[x].str.replace('geen info', '')
-        #we ensure that for the floats that we want there are no duplicates in the row coming from the groupby function:
+        #we ensure that for the floats (and for gemeente) that we want there are no duplicates in the row coming from the groupby function:
         def part(x):
           return x.partition(' ')[0]
-    
+        
+        g_fin['gemeente']=g_fin['gemeente'].map(part)
+        
         g_fin['woonopp']=g_fin['woonopp'].map(part)
         g_fin['slaapkamers']=g_fin['slaapkamers'].map(part)
         g_fin['dagen_online']=g_fin['dagen_online'].map(part)
@@ -122,7 +124,13 @@ if st.session_state.count==1:
         
         st._legacy_dataframe(g_fin.style
                              .format('€{:.0f}', subset=['prijs_m2', 'prijs', 'prijs_extra_kosten', 'oude_prijs'])
-                             .format('{:.0f}m²', subset=['woonopp']))
+                             .format('{:.0f}m²', subset=['woonopp'])
+                             .format('{:.0f}', subset=['slaapkamers'])
+                             .format('{:.0f}', subset=['dagen_online'])
+                             .format('{:.0f}', subset=['perceel_opp'])
+                             .format('{:.0f}', subset=['prijs_extra_kosten'])
+                             .format('{:.0f}', subset=['oude_prijs'])
+                            )
         
         st.bar_chart(g_fin['prijs_m2'])
         
