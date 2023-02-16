@@ -98,6 +98,18 @@ if st.session_state.count==1:
         replacers={'geen info': '', '_': ''}
         for x in lt:
           g_fin[x]=g_fin[x].str.replace('geen info', '')
+        #we ensure that for the floats that we want there are no duplicates in the row coming from the groupby function:
+        def part(x):
+          return x.partition(' ')[0]
+    
+        g_fin['woonopp']=g_fin['woonopp'].map(part)
+        g_fin['slaapkamers']=g_fin['slaapkamers'].map(part)
+        g_fin['dagen_online']=g_fin['dagen_online'].map(part)
+        g_fin['perceel_opp']=g_fin['perceel_opp'].map(part)
+        g_fin['prijs_extra_kosten']=g_fin['prijs_extra_kosten'].map(part)
+        g_fin['oude_prijs']=g_fin['oude_prijs'].map(part)
+    
+        #we ensure the float values are in float:
         g_fin['prijs_m2']=g_fin['prijs_m2'].replace('', np.nan).astype(float, errors='ignore')
         g_fin['prijs']=g_fin['prijs'].replace('', np.nan).astype(float, errors='ignore')
         g_fin['woonopp']=g_fin['woonopp'].replace('', np.nan).astype(float, errors='ignore')
