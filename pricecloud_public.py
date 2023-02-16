@@ -132,7 +132,10 @@ if st.session_state.count==1:
                              .format('{:.0f}', subset=['oude_prijs'])
                             )
         
-        st.bar_chart(g_fin['prijs_m2'])
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Gem prijs_m2", g_fin['prijs_m2'].mean(), "1.2 °F")
+        col2.metric("Gem prijs", g_fin['prijs'].mean(), "-8%")
+        col3.metric("Gem opp", g_fin['woonopp'].mean(), "4%")
         
         #prepare the Excel file for download:
         output = BytesIO()
