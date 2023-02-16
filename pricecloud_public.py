@@ -123,9 +123,9 @@ if st.session_state.count==1:
         g_fin.round(0)
         
         col1, col2, col3 = st.columns(3)
-        col1.metric("Gem prijs_m2", g_fin['prijs_m2'].mean().round(0), "1.2 °F")
-        col2.metric("Gem prijs", g_fin['prijs'].mean().round(0), "-8%")
-        col3.metric("Gem opp", g_fin['woonopp'].mean().round(0), "4%")
+        col1.metric("Gem prijs_m2", round(g_fin['prijs_m2'].mean(), 0), "1.2 °F")
+        col2.metric("Gem prijs", round(g_fin['prijs'].mean(), 0), "-8%")
+        col3.metric("Gem opp", round(g_fin['woonopp'].mean(), 0), "4%")
         
         
         st._legacy_dataframe(g_fin.style
